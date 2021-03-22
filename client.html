@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Player 1</h1> <br>
+<span id="x1"></span> <br>
+<span id="y1"></span> <br>
+<button id="step">Step</button> <br>
+
+<h1>Player 2</h1> <br>
+<span id="x2"></span> <br>
+<span id="y2"></span> <br>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+    let Q = (v) => document.querySelector(v);
+    let data = {};
+
+    let renderView = () => {
+        console.log(data);
+        Q('#x1').innerText = data['1'].x;
+        Q('#y1').innerText = data['1'].y;
+        Q('#x2').innerText = data['2'].x;
+        Q('#y2').innerText = data['2'].y;
+    }
+
+    axios.get('http://127.0.0.1:3434/server.php?action=get')
+        .then(function (response) {
+            data = response.data;
+            renderView();
+            play();
+        });
+
+    let play = () => {
+        setInterval(() => {
+            axios.get('http://127.0.0.1:3434/server.php?action=get')
+                .then(function (response) {
+                    data = response.data;
+                    renderView();
+                });
+        }, 500);
+
+        Q('#step').onclick = () => {
+            data['1'].x += 1;
+            data['1'].y += 1;
+            axios.get(`http://127.0.0.1:3434/server.php?action=set&player=1&x=${data['1'].x}&y=${data['1'].y}`);
+        }
+    }
+
+</script>
+</body>
+</html>
